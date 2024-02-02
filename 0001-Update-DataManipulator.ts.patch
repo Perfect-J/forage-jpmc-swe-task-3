@@ -1,0 +1,58 @@
+From 0d00f53dd1dd74dfd88626001e00dcb7fdca907b Mon Sep 17 00:00:00 2001
+From: Johnson Fadogba <johnsonayo532@gmail.com>
+Date: Sat, 3 Feb 2024 00:38:27 +0100
+Subject: [PATCH] Update DataManipulator.ts
+
+---
+ src/DataManipulator.ts | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/src/DataManipulator.ts b/src/DataManipulator.ts
+index 7f62295..c119991 100644
+--- a/src/DataManipulator.ts
++++ b/src/DataManipulator.ts
+@@ -1,20 +1,33 @@
+ import { ServerRespond } from './DataStreamer';
+ 
+ export interface Row {
+-  stock: string,
+-  top_ask_price: number,
++  price_abc: number,
++  price_def: number,
++  ratio: number,
+   timestamp: Date,
++  upper_bound: number,
++  lower_bound: numer,
++  trigger_alert: number | undefined,
+ }
+ 
+ 
+ export class DataManipulator {
+   static generateRow(serverResponds: ServerRespond[]) {
+-    return serverResponds.map((el: any) => {
+-      return {
+-        stock: el.stock,
+-        top_ask_price: el.top_ask && el.top_ask.price || 0,
+-        timestamp: el.timestamp,
+-      };
++    const priceABC = (serverRespond[0].top_ask.price + serverRespond[0].top_bid.price)/2;
++    const priceDEF = (serverRespond[1].top_ask.price + serverRespond[1].top_bid.price)/2;
++    const ration = prieceABC / priceDEF;
++    const upperBound = 1 + 0.05;
++    const lowerBound = 1 - 0.05;
++    return {
++      price_abc: priceABC,
++      price_def: priceDEF,
++      ratio,
++      timestamp: serverRespond[0].timestamp > serverRespond[1].timestamp ?
++        serverRespond[0].timestamp : serverRespond[1].timestamp,
++      upper_bound: upperBound,
++      lower_bound: lowerBound,
++      trigger_alert: (ratio > upperBound | | ratio < lowerBound) ? ratio : undefined,
++    };
+     })
+   }
+ }
+-- 
+2.25.1
+
